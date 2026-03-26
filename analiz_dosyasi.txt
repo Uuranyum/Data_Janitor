@@ -1,0 +1,62 @@
+1. 🏗️ Mimari: Textual Yerine Basit CLI
+Textual güzel ama bu proje için overkill. Bir veri temizleme aracı için typer + rich kombinasyonu çok daha uygun olurdu:
+
+bash
+# Tek komutla çalışır, interaktif TUI'ye gerek yok
+janitor analyze data.csv
+janitor clean data.csv --missing drop --duplicates --whitespace
+janitor clean data.csv --auto  # Otomatik hepsini temizle
+Neden? Pipeline'lara entegre edilebilir, scriptlerden çağrılabilir, CI/CD'de kullanılabilir. TUI bunların hiçbirini yapamaz.
+
+2. 🔄 Async LLM Çağrıları
+En kritik eksik bu. LLM çağrısı 5-10 saniye sürebilir ve şu anda tüm arayüz kilitleniyor. asyncio veya threading ile arka planda çalıştırılmalıydı.
+
+3. 📊 Bellek Yönetimi
+df.copy() ile her adımda tüm veriyi kopyalamak yerine, command pattern ile sadece yapılan işlemi kaydetmek lazımdı:
+
+python
+# Şu anki yaklaşım (kötü): Her adımda 500MB kopyalama
+self.df_history.append(self.df.copy())  # 💀
+# Olması gereken: Sadece işlemi kaydet
+self.history.append({"action": "drop_duplicates", "removed_indices": [3, 7, 12]})
+4. 🧪 Test Yapısı
+
+analyzer.py
+ ve 
+
+cleaner.py
+ saf fonksiyonlar — bunlar kolayca test edilebilir. En azından şunlar olmalıydı:
+
+tests/
+  test_analyzer.py    # analyze_data() edge case'leri
+  test_cleaner.py     # her temizleme yöntemi için
+  test_file_handler.py # format desteği testleri
+5. 📁 terminal.py'nin Bölünmesi
+797 satırlık tek dosya yerine:
+
+screens/
+  terminal/
+    __init__.py          # TerminalScreen (ana sınıf, ~100 satır)
+    menu_handler.py      # İnteraktif menü mantığı
+    auto_clean.py        # Auto clean queue mantığı  
+    command_router.py    # Komut parse & yönlendirme
+6. 🔐 Konfigürasyon
+API key'ler 
+
+.env
+'de açık metin yerine, keyring kütüphanesi ile OS-level güvenli depolama kullanılmalıydı. Veya en azından kullanıcıya 
+
+.env
+ dosyasının 
+
+.gitignore
+'da olup olmadığı konusunda uyarı verilmeliydi.
+
+7. 🎯 Eksik Temel Özellikler
+Sütun bazlı temizleme komuttan: clean --missing fill mean --column salary
+Dry-run modu: Değişiklikleri uygulamadan önce önizleme
+Rich Table ile veri gösterimi (şu an düz to_string())
+Progress spinner uzun LLM çağrıları için
+Özetle: Mevcut hali iyi bir prototip/demo. Ama "gerçek bir araç" olmak için CLI-first yaklaşım, async LLM, akıllı bellek yönetimi ve testler şart. Yapı güzel kurulmuş ama iç detaylar ham kalmış.
+
+Bu önerilerden herhangi birini uygulamak ister misiniz?

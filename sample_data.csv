@@ -1,0 +1,16 @@
+name,age,salary,department,city
+Ali,28,5000,Engineering,Istanbul
+Ayse,32,6500,Marketing,Ankara
+Mehmet,25,,Engineering,Izmir
+Fatma,29,5500,Marketing,Istanbul
+Ali,28,5000,Engineering,Istanbul
+Zeynep,35,7000,HR, Ankara 
+Emre,,4500,Engineering,Istanbul
+Deniz,27,4800,Sales,Izmir
+Hakan,31,6000,Marketing,Ankara
+Selin,26,5200,,Istanbul
+Ali,28,5000,Engineering,Istanbul
+Burak,45,150000,Engineering,Istanbul
+Canan,30,5800,HR,Ankara
+Merve,24,4200,Sales, Izmir
+Ece,33,6200,Marketing,Istanbul
