@@ -536,12 +536,10 @@ class TerminalScreen(Screen):
             context = format_report_for_llm(self.report, self.df)
             suggestions = await llm_service.get_cleaning_suggestions(context)
             if suggestions:
-                # Textual'da UI güncellemeleri main thread'de olmalı,
-                # ancak RichLog write thread-safe'dir veya call_from_thread kullanılabilir.
-                self.app.call_from_thread(log.write, f"\n[bold bright_cyan]🤖 LLM Önerileri:[/bold bright_cyan]\n{suggestions}\n")
+                log.write(f"\n[bold bright_cyan]🤖 LLM Önerileri:[/bold bright_cyan]\n{suggestions}\n")
 
         # Interaktif menüyü göster
-        self.app.call_from_thread(self._show_interactive_menu, log)
+        self._show_interactive_menu(log)
 
 
     # ══════════════════════════════════════════════════
@@ -697,7 +695,7 @@ class TerminalScreen(Screen):
     @work
     async def _async_ask(self, question: str, context: str, log: RichLog) -> None:
         response = await llm_service.ask(question, context)
-        self.app.call_from_thread(log.write, f"\n[bold bright_cyan]🤖 LLM Yanıtı:[/bold bright_cyan]\n{response}\n")
+        log.write(f"\n[bold bright_cyan]🤖 LLM Yanıtı:[/bold bright_cyan]\n{response}\n")
 
     # ══════════════════════════════════════════════════
     #  LLM SETUP
